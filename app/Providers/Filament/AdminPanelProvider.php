@@ -53,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('MySite')
             ->brandLogo(asset('logo.svg'))
             ->brandLogoHeight('50px')
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Amber,
             ])
