@@ -16,6 +16,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 
@@ -25,67 +29,142 @@ class CategoryForm
     {
         return $schema
             ->components([
+                //Wizard
+                Wizard::make([
 
-                Group::make()->schema([
+                    Step::make('Основное')->icon('heroicon-o-user')->schema([
+                        TextInput::make('first_name')->required(),
+                        TextInput::make('middle_name'),
+                        TextInput::make('last_name'),
+                        TextInput::make('email')->email(),
+                        TextInput::make('password')->password()->revealable()->columnSpanFull(),
+                    ])->columns(2),
 
-                    Section::make('Основное')
-                        ->description('Основная информация о пользователе')
-                        ->icon('heroicon-o-user')
-                        ->schema([
-                            TextInput::make('first_name'),
-                            TextInput::make('middle_name'),
-                            TextInput::make('last_name'),
-                            TextInput::make('email')->email(),
-                            TextInput::make('password')->password()->revealable()
-                                ->columnSpan('full'),
-                        ])->columnSpanFull()->columns(2)->collapsible(),
+                    Step::make('Контакты')->icon('heroicon-o-map')->schema([
+                        Select::make('country')->options(['Country 1', 'Country 2', 'Country 3']),
+                        Select::make('city')->options(['City 1', 'City 2', 'City 3']),
+                        Select::make('street')->options(['Street 1', 'Street 2', 'Street 3']),
+                        TextInput::make('zip')->required(),
+                        TextInput::make('phone')->tel()->mask('+99 999 999-99-99')
+                    ])->columns(2),
 
-                    Section::make('Контакты')
-                        ->description('Контактная информация пользователя')
-                        ->icon('heroicon-o-map')
-                        ->schema([
-                            Select::make('country')->options(['Country 1', 'Country 2', 'Country 3']),
-                            Select::make('city')->options(['City 1', 'City 2', 'City 3']),
-                            Select::make('street')->options(['Street 1', 'Street 2', 'Street 3']),
-                            TextInput::make('zip'),
-                            TextInput::make('phone')->tel()->mask('+99 999 999-99-99')
-                        ])->columnSpanFull()->columns(2)->collapsible()
+                    Step::make('Дополнительно')->icon('heroicon-o-user')->schema([
+                        Select::make('dob')->options(
+                            array_combine(
+                                range(date('Y'), 1900),
+                                range(date('Y'), 1900)
+                            )
+                        ),
+                        Radio::make('gender')->options(['male', 'female']),
+                    ])->columns(2),
 
-                ])->columnSpan(2),
-
-                Group::make()->schema([
-
-                    Section::make('Дополнительно')
-                        ->description('Дополнительная информация о пользователе')
-                        ->icon('heroicon-o-user')
-                        ->schema([
-                            Select::make('dob')->options(
-                                array_combine(
-                                    range(date('Y'), 1900),
-                                    range(date('Y'), 1900)
-                                )
-                            ),
-                            Radio::make('gender')->options(['male', 'female'])->inline()->inlineLabel(false),
-                        ])->columnSpanFull()->collapsible(),
-
-                    Section::make('Аватар')
-                        ->description('И еще немного')
-                        ->icon('heroicon-o-user')
-                        ->schema([
-                            FileUpload::make('avatar')->image(),
-                        ])->columnSpanFull()->collapsible()->collapsed(),
-
-
-                    Section::make('Примечание')
-                        ->description('И еще чуть-чуть')
-                        ->icon('heroicon-o-user')
-                        ->schema([
-                            Textarea::make('notes')->rows(4),
-                        ])->columnSpanFull()->collapsible()->collapsed(),
+                    Step::make('Аватар и примечание')->icon('heroicon-o-user')->schema([
+                        FileUpload::make('avatar')->image(),
+                        Textarea::make('notes')->rows(3),
+                    ])->columns(2),
                 ]),
 
 
 
+
+
+                //TABs
+                // Tabs::make()->tabs([
+
+                //     Tab::make('Основное')->icon('heroicon-o-user')->schema([
+                //         TextInput::make('first_name')->required(),
+                //         TextInput::make('middle_name'),
+                //         TextInput::make('last_name'),
+                //         TextInput::make('email')->email(),
+                //         TextInput::make('password')->password()->revealable()->columnSpanFull(),
+                //     ])->columns(2),
+
+                //     Tab::make('Контакты')->icon('heroicon-o-map')->schema([
+                //         Select::make('country')->options(['Country 1', 'Country 2', 'Country 3']),
+                //         Select::make('city')->options(['City 1', 'City 2', 'City 3']),
+                //         Select::make('street')->options(['Street 1', 'Street 2', 'Street 3']),
+                //         TextInput::make('zip')->required(),
+                //         TextInput::make('phone')->tel()->mask('+99 999 999-99-99')
+                //     ])->columns(2),
+
+                //     Tab::make('Дополнительно')->icon('heroicon-o-user')->schema([
+                //         Select::make('dob')->options(
+                //             array_combine(
+                //                 range(date('Y'), 1900),
+                //                 range(date('Y'), 1900)
+                //             )
+                //         ),
+                //         Radio::make('gender')->options(['male', 'female']),
+                //     ])->columns(2),
+
+                //     Tab::make('Аватар и примечание')->icon('heroicon-o-user')->schema([
+                //         FileUpload::make('avatar')->image(),
+                //         Textarea::make('notes')->rows(3),
+                //     ])->columns(2),
+                // ])
+
+
+                //Groups
+                // Group::make()->schema([
+
+                //     Section::make('Основное')
+                //         ->description('Основная информация о пользователе')
+                //         ->icon('heroicon-o-user')
+                //         ->schema([
+                //             TextInput::make('first_name'),
+                //             TextInput::make('middle_name'),
+                //             TextInput::make('last_name'),
+                //             TextInput::make('email')->email(),
+                //             TextInput::make('password')->password()->revealable()
+                //                 ->columnSpan('full'),
+                //         ])->columnSpanFull()->columns(2)->collapsible(),
+
+                //     Section::make('Контакты')
+                //         ->description('Контактная информация пользователя')
+                //         ->icon('heroicon-o-map')
+                //         ->schema([
+                //             Select::make('country')->options(['Country 1', 'Country 2', 'Country 3']),
+                //             Select::make('city')->options(['City 1', 'City 2', 'City 3']),
+                //             Select::make('street')->options(['Street 1', 'Street 2', 'Street 3']),
+                //             TextInput::make('zip'),
+                //             TextInput::make('phone')->tel()->mask('+99 999 999-99-99')
+                //         ])->columnSpanFull()->columns(2)->collapsible()
+
+                // ])->columnSpan(2),
+
+                // Group::make()->schema([
+
+                //     Section::make('Дополнительно')
+                //         ->description('Дополнительная информация о пользователе')
+                //         ->icon('heroicon-o-user')
+                //         ->schema([
+                //             Select::make('dob')->options(
+                //                 array_combine(
+                //                     range(date('Y'), 1900),
+                //                     range(date('Y'), 1900)
+                //                 )
+                //             ),
+                //             Radio::make('gender')->options(['male', 'female'])->inline()->inlineLabel(false),
+                //         ])->columnSpanFull()->collapsible(),
+
+                //     Section::make('Аватар')
+                //         ->description('И еще немного')
+                //         ->icon('heroicon-o-user')
+                //         ->schema([
+                //             FileUpload::make('avatar')->image(),
+                //         ])->columnSpanFull()->collapsible()->collapsed(),
+
+
+                //     Section::make('Примечание')
+                //         ->description('И еще чуть-чуть')
+                //         ->icon('heroicon-o-user')
+                //         ->schema([
+                //             Textarea::make('notes')->rows(4),
+                //         ])->columnSpanFull()->collapsible()->collapsed(),
+                // ]),
+
+
+                //Other good fetures
                 // TextInput::make('title')
                 //     ->default('Test article')
                 //     ->helperText(new HtmlString('Helper text for <strong>title</strong>'))
@@ -207,6 +286,7 @@ class CategoryForm
                 //     ->required()
                 //     ->columnSpanFull(),
 
-            ])->columns(3);
+                // ])->columns(3);
+            ])->columns(1);
     }
 }
