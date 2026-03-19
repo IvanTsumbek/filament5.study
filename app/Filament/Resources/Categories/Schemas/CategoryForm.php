@@ -22,6 +22,7 @@ use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class CategoryForm
 {
@@ -29,42 +30,82 @@ class CategoryForm
     {
         return $schema
             ->components([
-                //Wizard
-                Wizard::make([
 
-                    Step::make('Основное')->icon('heroicon-o-user')->schema([
-                        TextInput::make('first_name')->required(),
-                        TextInput::make('middle_name'),
-                        TextInput::make('last_name'),
-                        TextInput::make('email')->email(),
-                        TextInput::make('password')->password()->revealable()->columnSpanFull(),
-                    ])->columns(2),
+                Group::make()->schema([
+                    Section::make()->schema([
 
-                    Step::make('Контакты')->icon('heroicon-o-map')->schema([
-                        Select::make('country')->options(['Country 1', 'Country 2', 'Country 3']),
-                        Select::make('city')->options(['City 1', 'City 2', 'City 3']),
-                        Select::make('street')->options(['Street 1', 'Street 2', 'Street 3']),
-                        TextInput::make('zip')->required(),
-                        TextInput::make('phone')->tel()->mask('+99 999 999-99-99')
-                    ])->columns(2),
+                        TextInput::make('title')
+                            ->required()
+                            ->minLength(5)
+                            ->live(true)
+                            ->afterStateUpdated(
+                                function ($set, ?string $state, string $operation) {
+                                    if ($operation === 'edit') {
+                                        return;
+                                    }
+                                    $set('slug', Str::slug($state));
+                                }
+                            ),
 
-                    Step::make('Дополнительно')->icon('heroicon-o-user')->schema([
-                        Select::make('dob')->options(
-                            array_combine(
-                                range(date('Y'), 1900),
-                                range(date('Y'), 1900)
-                            )
-                        ),
-                        Radio::make('gender')->options(['male', 'female']),
+                        TextInput::make('slug')
+                            // ->hidden(function ($get) {
+                            //     return !$get('title');
+                            // })
+                            // ->hidden(fn ($get): bool => !$get('title')) //second solution
+                            ->required()
+                            ->unique()
+                            ->helperText('Генерируется автоматически на основе наименования')
+                            ->disabledOn('edit'),
+                        RichEditor::make('content')->columnSpan(2)->required(),
                     ])->columns(2),
+                ])->columnSpan(2),
 
-                    Step::make('Аватар и примечание')->icon('heroicon-o-user')->schema([
-                        FileUpload::make('avatar')->image(),
-                        Textarea::make('notes')->rows(3),
-                    ])->columns(2),
+                Group::make()->schema([
+                    Section::make()->schema([
+                        FileUpload::make('image')
+                            ->image()
+                            ->directory("preview/" . date('Y') . '/' . date('m') . '/' . date('d')),
+                    ]),
                 ]),
 
 
+
+
+
+                //Wizard
+                // Wizard::make([
+
+                //     Step::make('Основное')->icon('heroicon-o-user')->schema([
+                //         TextInput::make('first_name')->required(),
+                //         TextInput::make('middle_name'),
+                //         TextInput::make('last_name'),
+                //         TextInput::make('email')->email(),
+                //         TextInput::make('password')->password()->revealable()->columnSpanFull(),
+                //     ])->columns(2),
+
+                //     Step::make('Контакты')->icon('heroicon-o-map')->schema([
+                //         Select::make('country')->options(['Country 1', 'Country 2', 'Country 3']),
+                //         Select::make('city')->options(['City 1', 'City 2', 'City 3']),
+                //         Select::make('street')->options(['Street 1', 'Street 2', 'Street 3']),
+                //         TextInput::make('zip')->required(),
+                //         TextInput::make('phone')->tel()->mask('+99 999 999-99-99')
+                //     ])->columns(2),
+
+                //     Step::make('Дополнительно')->icon('heroicon-o-user')->schema([
+                //         Select::make('dob')->options(
+                //             array_combine(
+                //                 range(date('Y'), 1900),
+                //                 range(date('Y'), 1900)
+                //             )
+                //         ),
+                //         Radio::make('gender')->options(['male', 'female']),
+                //     ])->columns(2),
+
+                //     Step::make('Аватар и примечание')->icon('heroicon-o-user')->schema([
+                //         FileUpload::make('avatar')->image(),
+                //         Textarea::make('notes')->rows(3),
+                //     ])->columns(2),
+                // ]),
 
 
 
@@ -287,6 +328,6 @@ class CategoryForm
                 //     ->columnSpanFull(),
 
                 // ])->columns(3);
-            ])->columns(1);
+            ])->columns(3);
     }
 }
