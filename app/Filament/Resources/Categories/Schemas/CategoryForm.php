@@ -14,6 +14,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -53,7 +54,7 @@ class CategoryForm
                             // })
                             // ->hidden(fn ($get): bool => !$get('title')) //second solution
                             ->required()
-                            ->unique()
+                            ->unique(ignoreRecord: true)
                             ->helperText('Генерируется автоматически на основе наименования')
                             ->disabledOn('edit'),
                         RichEditor::make('content')->columnSpan(2)->required(),
@@ -62,6 +63,9 @@ class CategoryForm
 
                 Group::make()->schema([
                     Section::make()->schema([
+                        Toggle::make('is_featured')
+                            ->onColor('success')
+                            ->offColor('danger'),
                         FileUpload::make('image')
                             ->image()
                             ->directory("preview/" . date('Y') . '/' . date('m') . '/' . date('d')),
