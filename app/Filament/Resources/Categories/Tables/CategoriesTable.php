@@ -8,6 +8,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -23,13 +24,26 @@ class CategoriesTable
             ->defaultPaginationPageOption(5)  //дефолтное значение пагинации на странице
             ->extremePaginationLinks()   //кнопки пагинации на крайние страницы
             ->striped()   //таблица станет полосатой
+            ->searchPlaceholder('Search by title & slug')  //плейсхолдер строки поиска
+            ->searchDebounce('1000ms') //задержка строки поиска
             ->columns([
                 TextColumn::make('id')
                     ->label('ID'),
-                ImageColumn::make('image'),
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                IconColumn::make('is_featured')->boolean(),
+                ImageColumn::make('image')
+                    ->toggleable(),
+
+                ColumnGroup::make('Title & Slug', [
+                    TextColumn::make('title')->sortable()->searchable(),
+                    TextColumn::make('slug')
+                        ->toggleable()
+                        ->sortable()
+                        ->searchable(isIndividual: true) //поиск только по слагу
+                        ->copyable()   //возможность копирования содержимого кликом
+                        ->tooltip('click for copy')   //подсказка возможности копирования
+                        ->label('Slug (click for copy)')
+                ]),
+
+                IconColumn::make('is_featured')->boolean()->sortable(),
                 // ToggleColumn::make('is_featured')
                 //     ->afterStateUpdated(function () {
                 //         Notification::make()->title('Saved')->success()->send();
