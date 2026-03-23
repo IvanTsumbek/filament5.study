@@ -40,8 +40,8 @@ class CategoryForm
                             ->minLength(5)
                             ->live(true)
                             ->afterStateUpdated(
-                                function ($set, ?string $state, string $operation) {
-                                    if ($operation === 'edit') {
+                                function ($set, $get, ?string $state, string $operation) {
+                                    if ($operation == 'edit' && $get('slug') ) {
                                         return;
                                     }
                                     $set('slug', Str::slug($state));
@@ -56,7 +56,8 @@ class CategoryForm
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->helperText('Генерируется автоматически на основе наименования')
-                            ->disabledOn('edit'),
+                            // ->disabledOn('edit')
+                            ,
                         RichEditor::make('content')->columnSpan(2)->required(),
                     ])->columns(2),
                 ])->columnSpan(2),

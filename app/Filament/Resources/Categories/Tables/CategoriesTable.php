@@ -2,18 +2,30 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
+use App\Filament\Exports\CategoryExporter;
+use App\Filament\Imports\CategoryImporter;
+use App\Models\Category;
 use BladeUI\Icons\Components\Icon;
 use Dom\Text;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\View;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class CategoriesTable
 {
@@ -62,8 +74,32 @@ class CategoriesTable
             ->filters([
                 //
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(CategoryExporter::class),
+                ImportAction::make()
+                    ->importer(CategoryImporter::class)
+                    ->csvDelimiter(';'),
+            ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    ViewAction::make()->color('info'),
+                    ReplicateAction::make()
+                        ->excludeAttributes(['slug'])
+                        ->successRedirectUrl(fn(Model $replica) => route(
+                            'filament.admin.resources.categories.edit',
+                            $replica
+                        )),
+                    // admin/categories/{record}/edit filament.admin.resources.categories.edit
+                ])
+
+
+                // ->record()
+                // Action::make('delete')
+                //     ->requiresConfirmation()
+                //     ->action(fn(Category $record) => $record->delete()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
