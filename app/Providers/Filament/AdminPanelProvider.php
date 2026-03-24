@@ -32,28 +32,9 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             // ->registration()
             // ->passwordReset()
-            ->navigationGroups([
-                NavigationGroup::make('Блог')
-                ->collapsed(),
-                NavigationGroup::make('Ссылки')
-                ->collapsed(),
-            ])
-            ->navigationItems([
-                NavigationItem::make('Google')
-                ->url('https://google.com', true)
-                ->icon('heroicon-o-bookmark')
-                ->group('Ссылки')
-                ->sort(2),
-                NavigationItem::make('YouTube')
-                ->url('https://youtube.com', true)
-                ->icon('heroicon-o-archive-box-arrow-down')
-                ->group('Ссылки')
-                ->sort(1)
-            ])
             ->brandName('MySite')
             ->brandLogo(asset('logo.svg'))
             ->brandLogoHeight('50px')
-            ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Amber,
             ])
