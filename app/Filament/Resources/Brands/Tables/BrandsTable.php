@@ -1,38 +1,27 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Tables;
+namespace App\Filament\Resources\Brands\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 
-class CategoriesTable
+class BrandsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('id', 'desc')
+            ->defaultSort('title', 'asc')
             ->striped()
-            ->defaultPaginationPageOption(3)
-            ->paginated([3, 5, 10, 20, 'all'])
-            ->extremePaginationLinks()
             ->columns([
-                TextColumn::make('my_id')
-                    ->label('#')
-                    ->state(function (HasTable $livewire, \stdClass $rowLoop) {
-                        return $rowLoop->iteration + ($livewire->getTableRecordsPerPage() 
-                    * ($livewire->getTablePage() - 1));
-                    }),
+
                 TextColumn::make('id')->label('ID')->sortable(),
                 ImageColumn::make('photo'),
                 TextColumn::make('title')
                     ->searchable()
-                    ->sortable(),
-                TextColumn::make('parent.title') //relation
                     ->sortable(),
             ])
             ->filters([
