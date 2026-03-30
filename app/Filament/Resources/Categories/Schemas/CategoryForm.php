@@ -50,7 +50,7 @@ class CategoryForm
 
                         RichEditor::make('description')
                             ->fileAttachmentsDirectory("images/" . date('Y') . '/' . date('m')
-                        . '/' . date('d')),
+                                . '/' . date('d')),
                     ]),
                 ])->columnSpan(2),
 
@@ -60,18 +60,18 @@ class CategoryForm
                     Section::make()->schema([
 
                         Select::make('parent_id')
-                        ->options(function () {
-                            return CategoryResource::getCategoriesTree(Category::all());
-                        })
-                        ->disableOptionWhen(function ($get, string $value) {
-                            return $value == $get('id');
-                        })
-                        ->placeholder('Root category'),
+                            ->options(function () {
+                                return Category::getCategoriesTree(Category::all());
+                            })
+                            ->disableOptionWhen(function ($get, string $value) {
+                                return $value == $get('id');
+                            })
+                            ->placeholder('Root category'),
 
                         FileUpload::make('photo')
-                        ->image()
-                        ->directory("preview/" . date('Y') . '/' . date('m')
-                        . '/' . date('d'))
+                            ->image()
+                            ->directory("preview/" . date('Y') . '/' . date('m')
+                                . '/' . date('d'))
 
                     ]),
                 ]),

@@ -2,9 +2,13 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -24,8 +28,12 @@ class CategoriesTable
                 TextColumn::make('my_id')
                     ->label('#')
                     ->state(function (HasTable $livewire, \stdClass $rowLoop) {
-                        return $rowLoop->iteration + ($livewire->getTableRecordsPerPage() 
-                    * ($livewire->getTablePage() - 1));
+                        if ($livewire->getTableRecordsPerPage() == 'all') {
+                            return $rowLoop->iteration;
+                        }
+
+                        return $rowLoop->iteration + ($livewire->getTableRecordsPerPage()
+                            * ($livewire->getTablePage() - 1));
                     }),
                 TextColumn::make('id')->label('ID')->sortable(),
                 ImageColumn::make('photo'),
@@ -39,7 +47,22 @@ class CategoriesTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->disabled(function ($record) {
+                            return $record->children()->exists() || $record->products()->exists();
+                        })
+                        ->before(function ($record, $action) {
+                            if ($record->children()->exists() || $record->products()->exists()) {
+                                Notification::make()
+                                    ->body('Forbidden')
+                                    ->danger()
+                                    ->send();
+                                $action->cancel();
+                            }
+                        }),
+                ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
