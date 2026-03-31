@@ -59,6 +59,11 @@ class CategoryForm
 
                     Section::make()->schema([
 
+                        Select::make('Filter Groups')
+                            ->relationship('filterGroups', 'title')
+                            ->multiple()
+                            ->preload(),
+
                         Select::make('parent_id')
                             ->options(function () {
                                 return Category::getCategoriesTree(Category::all());
