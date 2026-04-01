@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -11,4 +12,9 @@ class Product extends Model
     protected $casts = [
         'photos' => 'array'
     ];
+
+    public function filters(): BelongsToMany
+    {
+        return $this->belongsToMany(Filter::class, 'filter_product', 'product_id', 'filter_id');
+    }
 }

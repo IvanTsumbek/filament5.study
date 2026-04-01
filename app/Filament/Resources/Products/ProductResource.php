@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class ProductResource extends Resource
 {
@@ -44,5 +45,28 @@ class ProductResource extends Resource
             'create' => CreateProduct::route('/create'),
             'edit' => EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getFiltersByCategory($categoryId)
+    {
+        $groupFilters = DB::table('category_filter_group')
+            ->where('category_filter_group.category_id', $categoryId)
+            ->selectRaw('
+                distinct category_filter_group.filter_group_id,
+                filter_groups.title as group_title,
+                filters.id as filter_id,
+                filters.title as filter_title
+            ')
+            ->join('filter_groups', 'category_filter_group.filter_group_id', '=', 'filter_groups.id')
+            ->join('filters', 'filters.filter_group_id', '=', 'filter_groups.id')
+            ->get();
+
+        $filter_groups = [];
+
+        foreach ($groupFilters as $filter) {
+            $filter_groups["{$filter->filter_group_id} - {$filter->group_title}"][$filter->filter_id] = $filter->filter_title;
+        }
+
+        return $filter_groups;
     }
 }

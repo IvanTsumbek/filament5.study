@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Filament\Resources\Categories\CategoryResource;
+use App\Filament\Resources\Products\ProductResource;
 use App\Models\Brand;
 use App\Models\Category;
 use Filament\Forms\Components\FileUpload;
@@ -51,6 +52,7 @@ class ProductForm
                             ->hint('Generated automatically based on title'),
 
                         Select::make('category_id')
+                            ->live()
                             ->options(function () {
                                 return Category::getCategoriesTree(Category::all());
                             })
@@ -80,6 +82,23 @@ class ProductForm
                 Group::make([
 
                     Section::make()->schema([
+
+                        Select::make('filter_id')
+                            ->label('Select filters')
+                            ->relationship('filters', 'title')
+                            ->multiple()
+                            ->searchable()
+                            ->preload('Start typing filter title')
+                            ->options(function ($get) {
+                                $categoryId = $get('category_id');
+
+                                if (!$categoryId) {
+                                    return [];
+                                }
+
+                                return ProductResource::getFiltersByCategory($categoryId);
+                            })
+                            ->columnSpanFull(),
 
                         TextInput::make('sku')
                             ->label('SKU')
