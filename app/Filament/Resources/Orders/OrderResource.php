@@ -45,4 +45,17 @@ class OrderResource extends Resource
             'edit' => EditOrder::route('/{record}/edit'),
         ];
     }
+
+    public static function recalculateTotal($set, $field_set, $field_get): void
+    {
+        $items = $field_get ?? [];
+        $total = 0;
+        foreach ($items as $item) {
+            $price = $item['price'] ?? 0;
+            $quantity = $item['quantity'] ?? 0;
+            $total +=  $price * $quantity;
+        }
+
+        $set($field_set , $total);
+    }
 }

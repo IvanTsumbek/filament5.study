@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Product;
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
@@ -60,7 +63,14 @@ class OrderForm
 
                                 TextInput::make('address')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->suffixAction(
+                                        Action::make('clear')
+                                            ->icon('heroicon-o-x-mark')
+                                            ->color('danger')
+                                            ->tooltip('Clear field')
+                                            ->action(fn($set) => $set('address', ''))
+                                    ),
 
                                 Select::make('status')
                                     ->options([
@@ -82,6 +92,9 @@ class OrderForm
 
                                 Repeater::make('products')
                                     ->relationship('orderProducts')
+                                    ->live()
+                                    ->afterStateUpdated(fn($state, $get, $set) =>
+                                    OrderResource::recalculateTotal($set, 'total', $get('products')))
                                     ->collapsed(false)
                                     ->schema([
 
@@ -97,19 +110,23 @@ class OrderForm
                                                     ->toArray();
                                             })
                                             ->getOptionLabelUsing(fn($value): ?string => Product::find($value)?->title)
-                                            ->afterStateUpdated(function ($state, $set) {
+                                            ->afterStateUpdated(function ($state, $set, $get) {
                                                 $product = Product::query()->find($state);
 
                                                 $set('title', $product?->title);
                                                 $set('slug', $product?->slug);
                                                 $set('price', $product?->price);
                                                 $set('photo', $product?->photo);
+                                                OrderResource::recalculateTotal($set, '../../total', $get('../'));
                                             }),
 
                                         TextInput::make('quantity')
                                             ->required()
                                             ->numeric()
-                                            ->default(1),
+                                            ->default(1)
+                                            ->live()
+                                            ->afterStateUpdated(fn($state, $get, $set) =>
+                                            OrderResource::recalculateTotal($set, '../../total', $get('../'))),
 
                                         TextInput::make('title')
                                             ->required()
